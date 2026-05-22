@@ -389,6 +389,15 @@ find_package(meshoptimizer CONFIG REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(s2 CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
+# Match the SPDLOG_USE_STD_FORMAT ABI used by downstream consumers (ftl::foundation).
+# Injecting it here ensures all cesium-native objects use std::string_view for spdlog
+# calls rather than fmt::v12::basic_string_view, so no compiled spdlog lib is needed.
+foreach(_spdlog_target spdlog::spdlog spdlog::spdlog_header_only)
+    if(TARGET ${_spdlog_target})
+        set_property(TARGET ${_spdlog_target} APPEND PROPERTY
+            INTERFACE_COMPILE_DEFINITIONS SPDLOG_USE_STD_FORMAT)
+    endif()
+endforeach()
 find_package(spz CONFIG REQUIRED)
 find_package(tinyxml2 CONFIG REQUIRED)
 find_package(unofficial-sqlite3 CONFIG REQUIRED)
